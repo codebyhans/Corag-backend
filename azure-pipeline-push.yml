@@ -1,0 +1,35 @@
+# Python to Linux Web App on Azure
+
+# Build your Python project and deploy it to Azure as a Linux Web App.
+# Change python version to one thats appropriate for your application.
+# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+
+trigger:
+- main
+
+variables:
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+
+  # Project root folder. Point to the folder containing manage.py file.
+  projectRoot: $(System.DefaultWorkingDirectory)
+
+  # Python version: 3.10
+  pythonVersion: '3.10'
+
+stages:
+- stage: DockerBuildPush
+  displayName: 'Buld and Push Docker Image'
+  jobs:
+  - job: DockerPushJob
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'costocksregistry'
+        repository: 'corag-backend'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
+        tags: 'latest'
+      

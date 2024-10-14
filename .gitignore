@@ -1,0 +1,17 @@
+# Ignore compiled output and dependencies
+/dist/
+/node_modules/
+/.cache/
+# Ignore IDE and editor-specific files
+.idea/
+.vscode/
+*.iml
+.pypirc
+.venv/
+__pycache__/
+pdm.toml
+.env
+
+# Ignore secret JSON files
+# /src/secrets-firebase.json
+# /src/secrets-google.json
