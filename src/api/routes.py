@@ -15,9 +15,13 @@ from prepare.store import Store
 from prepare.retrieve import Retrieve
 from prepare.llm import LLM
 from langchain.schema import HumanMessage, AIMessage  # Import AIMessage
-from fastapi.responses import StreamingResponse
 from typing import AsyncGenerator
 import datetime as dt 
+from fastapi import APIRouter, HTTPException, Query
+from fastapi.responses import StreamingResponse, JSONResponse
+from typing import AsyncGenerator, List, Dict, Any
+import asyncio
+import logging
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -39,30 +43,11 @@ class Message(BaseModel):
 class ChatRequest(BaseModel):
     question: str
     history: Optional[List[Message]] = []
-# Question answering endpoint
-from fastapi import APIRouter, HTTPException
-from fastapi.responses import StreamingResponse, JSONResponse
-from typing import AsyncGenerator, List, Dict, Any
-import asyncio
-import logging
 
-router = APIRouter()
-logger = logging.getLogger(__name__)
+class DeleteDocumentRequest(BaseModel):
+    passphrase: str
+    filename: str
 
-from fastapi import APIRouter, HTTPException, Query
-from fastapi.responses import StreamingResponse, JSONResponse
-from typing import AsyncGenerator, List, Dict, Any
-import asyncio
-import logging
-
-router = APIRouter()
-logger = logging.getLogger(__name__)
-
-from fastapi import APIRouter, HTTPException, Query
-from fastapi.responses import StreamingResponse, JSONResponse
-from typing import AsyncGenerator, List, Dict, Any
-import json
-import logging
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -113,20 +98,18 @@ async def get_documents(
         logger.error(f"Error during document retrieval: {e}")
         return JSONResponse(status_code=500, content={"message": "Failed to retrieve documents."})
 
-@router.delete('/delete-document')
+@router.post('/delete-document')
 async def delete_document(
-    passphrase: str = Query(...),
-    filename: str = Query(...)
+    request: DeleteDocumentRequest  # Use the new model for the request body
 ):
     """
     Delete a document associated with a given passphrase and filename.
 
-    :param passphrase: The passphrase to query documents for.
-    :param filename: The name of the document to delete.
+    :param request: The request body containing passphrase and filename.
     :return: JSONResponse indicating the success or failure of the operation.
     """
     try:
-        storage.delete_document(passphrase=passphrase, filename=filename)
+        storage.delete_document(passphrase=request.passphrase, filename=request.filename)
         return JSONResponse(status_code=200, content={"message": "Document deleted successfully."})
     except Exception as e:
         logger.error(f"Error during document deletion: {e}")
