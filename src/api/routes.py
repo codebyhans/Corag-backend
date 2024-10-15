@@ -228,7 +228,6 @@ async def upload_documents(
                 for document in documents: 
                     document.page_content = document.page_content.replace('\n', ' ')
 
-                print(documents)
                 # Split the document
                 chunks = splitter.split_documents(documents)
 
@@ -254,7 +253,6 @@ async def upload_documents(
             keep_until=expiration_time
             )
 
-        print(expiration)
         return JSONResponse(
             status_code=200,
             content={
